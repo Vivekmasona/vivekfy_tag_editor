@@ -1,0 +1,1738 @@
+<html>
+
+<!-- Mirrored from overbits.herokuapp.com/mp3tageditor/save_to_drive.php?twidth= by HTTrack Website Copier/3.x [XR&CO'2017], Wed, 28 Aug 2024 01:14:54 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>MP3 ID3 Tag Editor</title>
+<meta name="description" content="This online tag editor is designed to be easy and intuitive to use. Add, edit or remove tag metadata, including genre, title, artist, album, year, track number, cover image, lyrics, and more. Edit mp3 music file metadata in the browser, No file uploading to the server.">
+<meta name="keywords" content="mp3 tag editor, online mp3 tag editor, mp3 id3 editor, mp3 metadata editor, mp3 tag remover, mp3 metadata remover">
+
+<link rel="shortcut icon" href="favicon.ico">
+<head>
+<style>
+body,table,td,span,select,input,textarea{
+	font-size:14px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;;
+}
+button{
+	font-size:14px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;;
+}
+body{
+	background: white;
+}
+
+A:link    {color:#0860A8;text-decoration:none;}
+A:visited {color:#0860A8;text-decoration:none;}
+A:active  {color:#0860A8;text-decoration:underline;}
+A:hover  {color:#0860A8;text-decoration:underline;}
+.divopt{
+	/*-webkit-box-shadow: 0 0 10px #999;
+	-moz-box-shadow: 0 0 10px #999;
+	box-shadow: 0 0 10px #999;*/
+}
+.menulink{font-size:15px;}
+.input{width:630px;}
+.small{font-size:13px;}
+.header1{color:green}
+</style>
+
+<script>
+function setCookie(name, value, expires) { 
+  if (!expires) expires=1000*60*60*24*365*5;
+  path="../../external.html?link=https://overbits.herokuapp.com/";
+  domain=document.domain;
+  secure=false;
+  var today = new Date(); 
+  today.setTime( today.getTime() ); 
+  var expires_date = new Date( today.getTime() + (expires) ); 
+  document.cookie = name + "=" +escape( value ) + 
+          ( ( expires ) ? ";expires=" + expires_date.toGMTString() : "" ) + //expires.toGMTString() 
+          ( ( path ) ? ";path=" + path : "" ) + 
+          ( ( domain ) ? ";domain=" + domain : "" ) + 
+          ( ( secure ) ? ";secure" : "" ); 
+} 
+
+function getCookie( name ) {
+  var nameOfCookie = name + "=";
+  var x = 0;
+  while ( x <= document.cookie.length ) {
+    var y = (x+nameOfCookie.length);
+    if ( document.cookie.substring( x, y ) == nameOfCookie ) {
+      if ( (endOfCookie=document.cookie.indexOf( ";", y )) == -1 )
+         endOfCookie = document.cookie.length;
+      return unescape( document.cookie.substring( y, endOfCookie ) );
+    }
+    x = document.cookie.indexOf( " ", x ) + 1;
+    if ( x == 0 ) break;
+  }
+  return "";
+}
+
+function _getid(id){
+	return document.getElementById(id);
+}
+
+function trim(str) {
+  	return str.replace(/^\s*|\s*$/g,"");
+}
+
+function html_entity_encode(str){
+  str = str.replace(/&/gi, "&amp;");
+  str = str.replace(/>/gi, "&gt;");
+  str = str.replace(/</gi, "&lt;");
+  str = str.replace(/\"/gi, "&quot;");
+  str = str.replace(/\'/gi, "&#039;");
+  return str;
+}
+var henc=html_entity_encode;
+
+function shortstring(s,len){
+	if (!s) s='';
+	if (s.length > len) s=s.substr(0,len)+"...";
+	return s;
+}
+
+function cutstringmiddle(s,len,left,right){
+	if (s.length <= len) return s;			
+	var s1,s2;	
+	s1=s.substr(0,left);
+	s2=s.substr(s.length-right,s.length);	
+	return s1+'.....'+s2;
+}
+
+var g_expires=1000*60*60*6;
+function setstorage(name,value){
+	if (window.localStorage){
+		localStorage[name]=value+'';
+	}else{
+		//setCookie(name, value, 1000*60*60*24*365*10); 
+	}
+}
+function getstorage(name){
+	var s;
+	if (window.localStorage){
+		s=localStorage[name];
+	}else{
+		//s=getCookie(name);
+	}
+	return s;
+}
+
+function number_format(number, decimals, dec_point, thousands_sep) {
+  number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+  var n = !isFinite(+number) ? 0 : +number,
+    prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+    sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+    dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+    s = '',
+    toFixedFix = function (n, prec) {
+      var k = Math.pow(10, prec);
+      return '' + Math.round(n * k) / k;
+    };
+  s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+  if (s[0].length > 3) {
+    s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+  }
+  if ((s[1] || '').length < prec) {
+    s[1] = s[1] || '';
+    s[1] += new Array(prec - s[1].length + 1).join('0');
+  }
+  return s.join(dec);
+}
+function getWindowWidth(){
+    var windowWidth = 0;
+    if (typeof(window.innerWidth) == 'number'){
+        windowWidth = window.innerWidth;
+    }else{
+        var ieStrict = document.documentElement.clientWidth;
+        var ieQuirks = document.body.clientWidth; 
+        windowWidth = (ieStrict > 0) ? ieStrict : ieQuirks;
+    }
+	if(!windowWidth) windowWidth=0;
+    return windowWidth;
+}
+function getWindowHeight(){
+    var windowHeight = 0;
+    if (typeof(window.innerHeight) == 'number'){
+        windowHeight = window.innerHeight;
+    }else{
+        var ieStrict = document.documentElement.clientHeight; 
+        var ieQuirks = document.body.clientHeight;
+        windowHeight = (ieStrict > 0) ? ieStrict : ieQuirks;
+    }
+	if(!windowHeight) windowHeight=0;
+    return windowHeight;
+}
+function getScrollLeft(){
+    var scrollLeft;
+	if(document.body && document.body.scrollLeft){
+		scrollLeft = document.body.scrollLeft;
+	}else if(document.documentElement && document.documentElement.scrollLeft){
+		scrollLeft = document.documentElement.scrollLeft;
+	}
+	if(!scrollLeft) scrollLeft=0;
+    return scrollLeft;
+}
+function getScrollTop(){
+    var scrollTop;
+	if(document.body && document.body.scrollTop){
+		scrollTop = document.body.scrollTop;
+	}else if(document.documentElement && document.documentElement.scrollTop){
+		scrollTop = document.documentElement.scrollTop;
+	}
+	if(!scrollTop) scrollTop=0;
+    return scrollTop;
+} 
+
+var messagetimer=null;
+function show_message(s,x,y,padding,timeout){
+	if (!x) x=10;
+	if (!y) y=10;
+	if (!padding) padding=5;
+	if (!timeout) timeout=2000;
+
+	var kind=1;
+	for(var i=1; i <= 4; i++){
+		var s1="layer_message";
+		if (i>1) s1="layer_message"+i;
+		var obj=document.getElementById(s1);
+		if (obj){
+			kind=i;
+			break;
+		}
+	}
+			
+	obj.style.left="1px";
+	obj.style.top="1px";		
+	obj.innerHTML="<label>"+s+"</label>";
+	obj.style.display="";	
+	
+	if (kind==1) {
+		x=getScrollLeft()+x;	
+		y=getScrollTop()+y;
+	} else if (kind==2) {
+		x=getScrollLeft()+((getWindowWidth()-obj.clientWidth) / 2);
+		y=getScrollTop()+((getWindowHeight()-obj.clientHeight) / 2);
+	} else if (kind==3) {
+		x=document.body.offsetWidth-obj.clientWidth-5;
+		y=getScrollTop()+y;
+	} else {
+		x=getScrollLeft()+((getWindowWidth()-obj.clientWidth) / 2);
+		y=getScrollTop()+y;
+	}
+	x=parseInt(x);
+	y=parseInt(y);
+	
+	obj.style["border"]="1px solid #000000";
+	obj.style["padding"]=padding+"px";
+	obj.style.left=x+"px";
+	obj.style.top=y+"px";
+	
+	if (messagetimer) clearTimeout(messagetimer);
+	messagetimer=setTimeout(hide_message, timeout);
+}
+function hide_message(){
+	for(var i=1; i <= 4; i++){
+		var s1="layer_message";
+		if (i>1) s1="layer_message"+i;
+		var obj=document.getElementById(s1);
+		if (obj){
+			obj.style.display="none";
+		}
+	}
+}
+
+function validateURL(textval) {
+	var regexp = /^(?:(ftp|http|https):\/\/)?(?:[\w-]+\.)+([a-z]{2,6}|[0-9]{1,6})/i;	
+	return regexp.test(textval);
+}
+function getFileName(url) {
+	var p1=url.indexOf("#title=");
+	if(p1>=0){
+		var s=url.substr(p1+("#title=").length, url.length);
+		if(s){
+			try{
+				s=decodeURIComponent(s);
+				return s;
+			}catch(err){}			
+		}
+	}
+  url = url.substring(0, (url.indexOf("#") == -1) ? url.length : url.indexOf("#"));
+  url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
+  url = url.substring(url.lastIndexOf("/") + 1, url.length);
+  return url;
+}
+function getsize(fileSize){
+	if(!fileSize) return 'Unknown Size';
+	function humanFileSize(bytes){
+		var thresh = 1024;
+		if(bytes < thresh) return bytes + ' B';
+		var units = ['kB','MB','GB','TB','PB','EB','ZB','YB'];
+		var u = -1;
+		do {
+			bytes /= thresh;
+			++u;
+		} while(bytes >= thresh);
+		return bytes.toFixed(1)+' '+units[u];
+	}
+	return humanFileSize(fileSize);
+}					
+
+var g_logcount=0;
+function _log(name,s,state,noenc){
+function proc_log(s){
+	var obj=_getid(name);
+	/*if(obj.style.display!='') obj.style.display='';
+	if(g_logcount>200){
+		g_logcount=0;
+		obj.innerHTML='';
+	}*/
+	var a=document.createElement("div");
+	a.setAttribute('style','display:block;');
+	if(!state) state='';
+	var s1=s; if(!noenc) s1=henc(s1);
+	s='<font class="'+state+'">'+s1+'</font>';	
+	a.innerHTML=s;
+	obj.appendChild(a);  
+	obj.scrollTop=obj.scrollHeight;
+	g_logcount++;
+}
+	if(name=='log4' || name=='log5' || name=='log6'){
+		proc_log(s);
+		return;
+	}
+	var a=_getid(name);
+	var s1=a.value;
+	if(s1) s1+='\n';
+	a.value=s1+s;
+	a.scrollTop=a.scrollHeight;
+}
+
+var iserror;
+function proc_log(name,s,state,s2){
+	if(name=='log1')name='log4';
+	function go(name){
+		var obj=_getid(name);
+		var a=document.createElement("div");
+		a.setAttribute('style','display:block;');
+		if(!state) state='';
+		var s3='<font class="'+state+'">'+henc(s)+'</font>';
+		if(s2) s3+=' '+s2;
+		a.innerHTML=s3;		
+		obj.appendChild(a);  
+		obj.scrollTop=obj.scrollHeight;
+	}
+	go(name);
+	if(state=='error'){
+		iserror=true;
+		go('log5');
+	}
+}
+
+function regex_decode(str){
+  str = str.replace(/\\/gi, "\\\\");
+  str = str.replace(/\^/gi, "\\^");
+  str = str.replace(/\$/gi, "\\$");
+  str = str.replace(/\*/gi, "\\*");
+  str = str.replace(/\+/gi, "\\+");
+  str = str.replace(/\?/gi, "\\?");
+  str = str.replace(/\./gi, "\\.");
+  str = str.replace(/\(/gi, "\\(");
+  str = str.replace(/\)/gi, "\\)");
+  str = str.replace(/\|/gi, "\\|");
+  str = str.replace(/\{/gi, "\\{");
+  str = str.replace(/\}/gi, "\\}");
+  str = str.replace(/\[/gi, "\\[");		
+  str = str.replace(/\]/gi, "\\]");
+  return str;
+}
+
+function fillnumber(s){
+	s=String(s);
+	if ( s.length==1 ) { 
+		return '0'+s;  
+	}
+	return s;
+}	
+function datetimetostring(ts){
+	var t=new Date(ts);
+	var s='';
+	if(!isNaN(t)){
+		var y=t.getFullYear();
+		var m=t.getMonth()+1;
+		var d=t.getDate();
+		s=y+'-'+fillnumber(m)+'-'+fillnumber(d)+' '+fillnumber(t.getHours())+':'+fillnumber(t.getMinutes())+':'+fillnumber(t.getSeconds());
+	}
+	return s;
+}
+
+var gformats=[["pdf","application/pdf"],["gif","image/gif"],["jpg","image/jpeg"],["jpeg","image/jpeg"],["png","image/png"],["doc","application/msword"],["docx","application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+["htm","text/html"],["html","text/html"],["txt","text/plain"],["text","text/plain"],["odt","application/vnd.oasis.opendocument.text"],
+["ppt","application/vnd.ms-powerpoint"],["pptx","application/vnd.openxmlformats-officedocument.presentationml.presentation"],["odp","application/vnd.oasis.opendocument.presentation"],
+["xls","application/vnd.ms-excel"],["ods","application/vnd.oasis.opendocument.spreadsheet"],["xlsx","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],["csv","text/csv"],["tsv","text/tab-separated-values"]];
+function getmimetype(s){
+	var arr=(s || '').split(".");
+	var ext=arr[arr.length-1].toLowerCase();
+	for(var i=0; i <= gformats.length-1; i++){
+		if(gformats[i][0]==ext){
+			return gformats[i][1];
+		}
+	}
+}
+function proc_show(name){
+	var a=_getid(name);
+	if(!a)return;
+	if(a.style.display=='') a.style.display='none';
+	else a.style.display='';
+}
+
+function proc_switchlog(id,f){
+	for(var i = 1; i <= 7; i++){
+		var a=_getid("log"+i);
+		if(a) a.style.display='none';
+	}
+	var a=_getid("log"+id);
+	a.style.display='';
+
+	var a=_getid("logtab").getElementsByTagName('A');
+	for(var i = 0; i < a.length; i++){    
+		a[i].style.fontWeight="normal";
+	}
+	f.style.fontWeight="bold";
+	return false;
+}
+function init(){
+	window.onunload=function(){
+	}	
+}
+</script>
+</head>
+<body onload="init()">
+
+<table id="maintable" width=650 border=0 align=center class="divopt" style="background-color:white;padding:6px 6px 6px 6px;border: 0px solid #2E79DB;">
+<tr><td>
+<style>
+.uploaded{color:green;}
+.error{color:#8A0808;}
+.welcome{color:#45616D;}
+.bold1{color:green;}
+.log{width:100%;height:150px;}
+.big1{	font-size:19px;}
+#logtab a{font-size:14px;}
+#gd_progress{width:490px;white-space:nowrap;overflow:hidden;border:0px solid red;}
+#gd_progress2{width:450px;white-space:nowrap;overflow:hidden;border:0px solid red;}
+.filename{width:350px;white-space:nowrap;overflow:hidden;border:0px solid red;}
+</style>
+	<table width=100%>	
+		<tr><td>
+			<button type="button" id="btn_open" onclick="gd_open_picker(2)" title="Select target folder to save from Google Drive"><img src="images/gdrive/product16.png" width=18 align="absmiddle"> Select folder to save from Google Drive</button>
+			<button type="button" id="btn_root" onclick="proc_setfolder('','');" title="Reset to Root Folder">Root Folder</button>
+			<button type="button" onclick="attach_delete()">Remove</button>
+			<button type="button" onclick="attach_clear()">Clear</button>		
+
+			<table cellpadding=0 cellspacing=0><tr>
+			<td><div id="foldername2" style="width:300px;white-space:nowrap;overflow:hidden;border:0px solid red;font-size:15px;margin-top:2px;margin-bottom:2px;">Root Folder</div>
+			<td><div id="foldername3" style="width:300px;white-space:nowrap;overflow:hidden;border:0px solid red;font-size:14px;margin-left:5px"></div>
+			</table>
+		<tr><td>			
+			<div id="downlink" style="margin-bottom:2px">Add a file to the list below.</div>
+			<select id='attachment' style="width:100%;height:140px" multiple=true onchange="attachment_onchange(this)" onclick="attachment_onchange(this)"></select>
+
+			<div id="desc" style="margin-top:2px;color:green;width:580px;white-space:nowrap;overflow:hidden;border:0px solid red"></div>
+
+		<tr><td align=center>
+			<button type="button" onclick="cl_upload()" style="font-size:17px">Save to Google Drive</button>
+			<button type="button" onclick="proc_close()" style="font-size:17px">Close</button>
+			<button type="button" onclick="proc_show('optcontainer')" style="display:none">Add a URL to save</button>		
+
+		<tr><td align=center>
+			<button onclick="proc_show('optcontainer')" class="" style="display:none">Options</button>		
+		<tr><td>
+			<form id="optcontainer" name="optcontainer" style="display:none;border:2px dashed #0860A8;padding:2px;margin-bottom:5px;" onsubmit="cl_addupload(); return false">
+				<table>
+				<tr><td>Download URL <td><input type=text name=url style="width:440px" spellcheck=false onclick="this.select()">
+				<tr><td>Filename to save<br>(Optional) <td><input type=text name=filename style="width:300px" spellcheck=false> <button type=submit>Add to list</button>
+				</table>
+			</form>
+
+			<div id="logtab">
+				<a href="#" id="alog4" onclick="return proc_switchlog(4,this)" style="font-weight:bold">Download, Upload Log</a> &nbsp;&nbsp;<a href="#" id="alog5" onclick="return proc_switchlog(5,this)">Error Log</a>
+			</div>
+		<tr><td>
+			<div id="downlink2" style="margin-bottom:2px"></div>
+			<div id="log4" class="log" style="overflow-y:scroll;"></div>
+			<div id="log5" class="log" style="overflow-y:scroll;display:none"></div>
+	</table>
+
+<tr><td>
+
+</table>
+
+<script type="text/javascript">
+var postdata='';
+function cl_additem(obj2,data){
+		var d={};
+		d.service=data.service || '';
+		d.filename=data.name || getFileName(data.link) || 'No Name';
+		d.link=data.link || '';
+		d.mimeType=data.mimeType || '';
+		var p1=d.link.indexOf("#title=");
+		if(p1>=0){
+			d.link=d.link.substr(0,p1);
+		}
+		d.size=data.size || 0;
+		var c=document.createElement("option");
+		gd_files_count++;
+		d.idx=gd_files_count;
+		s=d.filename+' ('+getsize(d.size)+')'+' - '+d.service;
+		c.value=d.idx;
+		c.appendChild(document.createTextNode(s));		 
+		obj2.appendChild(c);					
+		gd_files.push(d);
+}
+function cl_addupload2(){
+	var arr=[];
+	try{
+		arr=JSON.parse(decodeURIComponent(postdata));
+	}catch(err){
+		arr=[];
+	}
+	var obj2=_getid("attachment");
+	for(var i = 0; i < arr.length; i++){    
+		if(!arr[i].link)continue;
+		cl_additem(obj2,arr[i]);
+	}
+	if(obj2.options.length>0){
+		obj2.selectedIndex=0;
+		attachment_onchange();
+	}
+}
+function cl_addupload(){
+	var url=trim(document.optcontainer.url.value);
+	var filename=trim(document.optcontainer.filename.value);
+	if(!url || !validateURL(url)){
+		alert('This is a invalid URL.');
+		document.optcontainer.url.focus();
+		return;
+	}
+	var data={};
+	data.service='User Added';
+	data.name=filename;
+	data.link=url;
+	cl_additem(_getid("attachment"),data);
+}
+
+var ischrome=false;
+if (navigator.userAgent.indexOf("Chrome")>=0) ischrome=true;
+
+function init_load(){
+	var id=getstorage('mp3t_gd_folder_id') || '';
+	var name=getstorage('mp3t_gd_folder_name') || 'Root Folder';
+	proc_setfolder(id, name);
+	//_getid('c_maxdown').value=getstorage('c_maxdown') || 100;
+
+	var sw=_getid('attachment').offsetWidth;
+	for(var i = 1; i <= 7; i++){
+		var a=_getid("log"+i);
+		if(a){
+			if(ischrome) a.setAttribute("readonly", "true");
+			a.setAttribute("spellcheck", "false");
+			a.setAttribute("wrap", "off");
+			a.style.width=sw+'px';
+		}
+	}
+	cl_addupload2();
+	}
+</script>
+
+<style>
+.gd_div{background-color:#FFFFE1;position:absolute;overflow:hidden;-webkit-box-shadow: 0 0 25px #999;-moz-box-shadow: 0 0 25px #999;box-shadow: 0 0 25px #999;}
+</style>
+<div id="layer_message" class="gd_div" style="z-index:10001;display:none;"></div>
+<div id="gd_window" class="gd_div" style="z-index:10000001;display:none;"></div>
+<div id="gd_btn_login" class="gd_div" style="z-index:10000000;display:none;">
+<table>
+<tr><td align=center><button onclick="gd_login_manual()" style="font-size:20px"><img src="images/gdrive/product20.png" align="absmiddle"> Login & Authorize</button> <button onclick="gd_login_close()" style="font-size:20px">Close</button>
+<tr><td>To use this app, Please login to the Google Drive and authorize this app or website.
+<br>(Note: If your browser block or disable the third-party cookies, this login does not work correctly.)
+</table>
+</div>
+<script>
+var CLIENT_ID = '529454083459-ph2df6t3gmku2e87nkotnidil43gll0m.apps.googleusercontent.com';
+var SCOPES = [
+	'https://www.googleapis.com/auth/drive.install',
+	'../../external.html?link=https://www.googleapis.com/auth/drive.file'
+];
+var gd_developerKey='AIzaSyAce0gbnNWgkfUuFTYAtBK3ioZek3QUU-8';
+var gd_mimetype="";
+var gd_export_extension=[];
+var gd_state='';
+
+var gd_picker,gd_picker2,gd_loaded,gd_pickerloaded,gd_lastprogress,gd_issupported,gd_isdownloading,gd_load_timer,gd_bloburl,gd_state2;
+var gd_loginexp=0;
+var gd_callback;
+var ismsie=false;
+if(navigator.appName!="Netscape"){
+	if(navigator.userAgent.indexOf("MSIE")>=0) ismsie=true;
+}
+
+function gd_btn_login2(e,callback){
+	function go(a){
+		if(a && a.style.display==''){
+			var x=getScrollLeft()+((getWindowWidth()-a.clientWidth) / 2);
+			var y=getScrollTop()+((getWindowHeight()-a.clientHeight) / 2);
+			a.style["border"]="1px solid #000000";
+			a.style["padding"]="10px";
+			a.style.left=x+"px";
+			a.style.top=y+"px";
+		}
+	}
+	go(_getid("gd_btn_login"));
+	go(_getid("gd_window"));	
+	setTimeout(function(){
+		go(_getid("gd_btn_login"));
+		go(_getid("gd_window"));	
+		if(callback)callback();
+	},10);
+}
+function gd_btn_login(isshow){
+	var a=_getid("gd_btn_login");
+	if(isshow){
+		a.style.display='';
+		gd_btn_login2();
+	}else{
+		a.style.display='none';
+	}
+}
+function gd_login_close(){
+	gd_btn_login(false);
+	gd_state='';
+}
+function gd_login_manual(){
+	var p={'client_id': CLIENT_ID, 'scope': SCOPES.join(' '), 'immediate': false};
+	if(gd_userId){p['login_hint']=gd_userId;p['authuser']=-1;}
+	gapi.auth.authorize(p, function (authResult){ 
+		if (authResult && !authResult.error){
+			gd_loginexp=(new Date()).getTime()+parseInt(authResult.expires_in*0.7*1000);
+			gd_btn_login(false);gd_info();
+			show_message("Login ok!!");
+			if(gd_callback) gd_callback(true);
+			else gd_open_state(true);
+		}else{
+			gd_btn_login(true);
+			show_message("Login failed!!");
+		}
+	});
+}
+function gd_login(callback,react){
+	if(gd_loginexp==0 || gd_loginexp<(new Date()).getTime()){
+	}else{
+		callback(true);
+		return;
+	}
+	var p={'client_id': CLIENT_ID, 'scope': SCOPES.join(' '), 'immediate': true};
+	if(gd_userId){p['login_hint']=gd_userId;p['authuser']=-1;}
+	gapi.auth.authorize(p, function (authResult){
+		if (authResult && !authResult.error){
+			gd_loginexp=(new Date()).getTime()+parseInt(authResult.expires_in*0.7*1000);
+			gd_btn_login(false);gd_info();
+			callback(true);
+		}else{
+			show_message("Login failed!!");
+			gd_btn_login(true);
+			callback(false);
+			if(react) gd_callback=callback;
+			else gd_callback=null;
+		}
+	});
+}
+function gd_checklogin(callback){
+	gd_login(function(result){
+		if(result)callback();
+	},true);
+}
+
+function gd_loadpicker() {		
+	gapi.load('picker',{'callback': function(){
+			gd_pickerloaded=true;
+		}
+	});	
+}
+function gd_createpicker(kind) {
+	function gd_pickercallback(data) {
+		if (data.action == google.picker.Action.PICKED) {
+			if(data.docs && data.docs.length>0 && data.docs[0].id){
+				if(!kind){
+					gd_loadfiles(data.docs);
+				}else if(kind==2 || kind==3){
+					if(data.docs[0].type!="folder"){
+						alert("It's not a folder.");
+						return;
+					}
+					var id=data.docs[0].id;
+					var name=data.docs[0].name;
+					proc_setfolder(id, name, kind);
+				}
+			}
+		}
+	}
+	var access_token=gapi.auth.getToken().access_token;
+	if(!access_token){
+		alert('Error!! No access token.');
+		return;
+	}
+	if(!kind){
+	 if(!gd_picker){
+	  var view2 = new google.picker.DocsView(google.picker.ViewId.DOCS);
+	  if(gd_mimetype) view2.setMimeTypes(gd_mimetype);
+	  view2.setMode(google.picker.DocsViewMode.LIST);
+
+		var view4 = new google.picker.DocsView();
+		view4.setIncludeFolders(true);
+		view4.setParent("root");
+		view4.setMimeTypes(gd_mimetype);
+		view4.setMode(google.picker.DocsViewMode.LIST);
+		//var view5 = new google.picker.View(google.picker.ViewId.RECENTLY_PICKED);
+
+      gd_picker = new google.picker.PickerBuilder()
+		  .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+		  .setLocale("en")
+		  .setAppId(CLIENT_ID.split("-")[0]) //scope
+          .setOAuthToken(access_token)
+		  .setTitle("Select files")
+          .addView(view2)
+		  .addView(view4)
+		  //.addView(view5)
+          .addView(new google.picker.DocsUploadView())
+          .setDeveloperKey(gd_developerKey)
+          .setCallback(gd_pickercallback)
+          .build();
+	 }
+	 gd_picker.setVisible(true);
+	}else if(kind==2 || kind==3){
+	  if(!gd_picker2){
+		var docsView = new google.picker.DocsView()
+          .setIncludeFolders(true) 
+		  .setParent("root")
+          .setMimeTypes('application/vnd.google-apps.folder')
+		  .setMode(google.picker.DocsViewMode.LIST)
+          .setSelectFolderEnabled(true);
+		var view5 = new google.picker.View(google.picker.ViewId.RECENTLY_PICKED);
+
+        gd_picker2 = new google.picker.PickerBuilder()
+		   //.enableFeature(google.picker.Feature.NAV_HIDDEN)
+		  .setLocale("en") 
+		  .setAppId(CLIENT_ID.split("-")[0]) //scope
+          .setOAuthToken(access_token)
+		  .setDeveloperKey(gd_developerKey)
+		  .setTitle("")//Select Target Folder
+          .addView(docsView)
+		  .addView(view5)
+          .setCallback(gd_pickercallback)
+          .build();
+	  }
+	  gd_picker2.setVisible(true);
+	}
+}
+
+var gd_files=[];
+var gd_files_count=0;
+function gd_loadfiles(docs,isstart){
+	if(gd_isdownloading){
+		alert("It's working... Please try again in a few minutes. or Cancel the current job.");
+		return;
+	}
+	function end(){
+		gd_isdownloading=false;
+		clearTimeout(messagetimer);
+		hide_message();
+		var a=_getid("downlink");
+		if(a.innerHTML && a.innerHTML.indexOf("adownlink")<0){
+			_getid("downlink").innerHTML="<span id=spancount></span>";
+		}		
+		attachment_count();
+	}	
+	var canceled=false;
+	_getid("downlink").innerHTML="<table><tr><td><img src='images/wait.gif' align='absmiddle'><td><a href='#' id='gd_cancel'>Cancel</a><td><div id='gd_progress'>Getting file information...</div></table>";	
+	_getid('gd_cancel').onclick=function(){
+		canceled=true;
+		return false;
+	}
+	gd_isdownloading=true;
+	if(!docs){
+		end();return;
+	}
+
+	var files=[];
+	for(var i = 0; i <= docs.length-1; i++){
+		if(!docs[i].id)continue;
+		var d={};
+		d.id=docs[i].id;
+		d.name=docs[i].name;
+		files.push(d);
+	}
+	
+	function complete(){
+	}
+	function get(idx){
+		if(idx>files.length-1 || canceled){
+			end();
+			complete();
+			return;
+		}
+		var fileId=files[idx].id;
+		var a=_getid("gd_progress");
+		if(a) a.innerHTML='Getting file info... ('+(idx+1)+'/'+files.length+')';
+
+			var request = gapi.client.drive.files.get({
+				'fileId': fileId
+			});
+			request.execute(function(resp){
+				function _set(resp){
+					var s=resp.title || 'No Name';
+					_getid('foldername3').innerHTML='<a href="#" id="asetfolder">Select this folder</a> '+henc(s);
+					_getid('asetfolder').onclick=function(){
+						proc_setfolder(resp.id, s);
+						return false;
+					}
+				}
+				if(isstart && resp.mimeType=='application/vnd.google-apps.folder'){
+					end();
+					_set(resp);
+					return;
+				}
+				if(resp.error){
+					var s='Error. ';
+					if(files[idx].name) s+=files[idx].name+'  ';
+					if(resp.error.message) s+=resp.error.message+' ';
+					if(resp.error.code==401) s+='Login or Authorize Error.';					
+					proc_log('log1',s,'error');
+				}
+				if(isstart){
+					var p=resp.parents;
+					if(p && p[0] && p[0].id){
+						//files.push({'id': p[0].id, 'name':''});
+						end();
+						_set({'title':'Parent folder of '+(resp.title || 'No Name'), 'id':p[0].id});
+						return;
+					}
+				}
+				files[idx].resp=resp;
+				idx++;
+				get(idx);
+			});
+	}
+
+	if(files.length==0){
+		end();return;
+	}
+	gapi.client.load('drive', 'v2', function(){
+		get(0);
+	});
+}
+
+function retrieveAllFiles(query,callback) {
+  var retrievePageOfFiles = function(request, result) {
+    request.execute(function(resp) {
+      result = result.concat(resp.items);
+      var nextPageToken = resp.nextPageToken;
+      if (nextPageToken) {
+        request = gapi.client.drive.files.list({
+          'q': query, 'pageToken': nextPageToken,
+        });
+        retrievePageOfFiles(request, result);
+      } else {
+        callback(result);
+      }
+    });
+  }
+  var initialRequest = gapi.client.drive.files.list({
+		'q': query		
+       });
+  retrievePageOfFiles(initialRequest, []);
+}
+
+function proc_logincheck(){
+	_getid("log4").innerHTML='';
+	_getid("log5").innerHTML='';	
+	var b=_getid("gd_progress2");
+	if(b) b.innerHTML='';
+	_log("log4",'Login checking...','welcome');
+}
+
+function cl_upload(){
+	if(gd_isdownloading){
+		alert("It's working... Please try again in a few minutes. or Cancel the current job.");
+		return;
+	}
+	if(!gd_useable())return;
+
+	proc_logincheck();
+	gd_login(function(result){
+		if(!result) return;
+		cl_upload2();
+	},true);
+}
+function cl_upload2(){
+	iserror=false;
+	if(gd_isdownloading)return;
+	var files;
+	try{
+		files=JSON.parse(JSON.stringify(gd_files));
+	}catch(err){
+		files=gd_files;
+	}
+	if(files.length==0){
+		alert('No selected file.');
+		return;
+	}
+	var accessToken = gapi.auth.getToken().access_token;
+	if(!accessToken){
+		alert('Error!! No access token.');
+		return;
+	}
+
+	var targetfolderid2=getstorage('mp3t_gd_folder_id') || ''; //save folder
+	proc_switchlog(4,_getid('alog4'));
+  
+  function checkfolder2(fileId,callback){
+	var request = gapi.client.drive.files.get({
+		'fileId': fileId
+	});
+	request.execute(function(resp){
+		callback(resp);
+	});
+  }
+  
+  gapi.client.load('drive', 'v2', function(){
+	  go(); //scope
+	/*proc_log('log1','Folder checking...','welcome');
+	if(!targetfolderid2){
+		go();return;
+	}
+	checkfolder2(targetfolderid2,function(resp){
+		if(resp && resp.id){
+			go();
+		}else{
+			proc_log('log1','Target folder for save does not exist.','error');
+		}
+	});*/
+  });
+
+  function go(){	
+	  if(gd_isdownloading)return;
+	var xhr= new XMLHttpRequest(); //upload
+	var xhr2= new XMLHttpRequest(); //download
+
+	g_canceled=false;
+	gd_isdownloading=true;
+	_getid("downlink2").innerHTML="<table><tr><td><a href='#' id='gd_cancelall' style='display:none' title='Cancel all tasks'>Cancel all</a>&nbsp;<td><a href='#' id='gd_cancel2' style='display:none' title='Cancel the current task'>Cancel</a><td><div id='gd_progress2'></div></table>";		
+	proc_log('log1','Started...','welcome');
+
+	var c=_getid('gd_cancelall');
+	if(c){
+		c.style.display='';
+		c.onclick=function(){
+			g_canceled=true;
+			var a=_getid('gd_cancel2');
+			if(a && a.onclick) a.onclick();
+			return false;
+		}
+	}
+
+	function _end(){
+		gd_isdownloading=false;
+		var c=_getid('gd_cancelall');if(c) c.style.display='none';
+		var c=_getid('gd_cancel2');if(c) c.style.display='none';
+		var s='Completed.';
+		if(iserror) s+=' but there are some errors. Check the error log.'; 
+		proc_log('log1',s,'welcome');
+	}
+	function get(idx){
+		function _next(){
+			xhr.abort();xhr2.abort();
+			setTimeout(function(){
+				idx++;
+				get(idx);
+			},20);
+		}
+		function _progress(name,s,state,s2){
+			s='['+(idx+1)+'/'+files.length+'] '+s+' '+files[idx].filename;
+			proc_log(name,s,state,s2);
+		}
+		if(g_canceled || idx>files.length-1){
+			_end();
+			return;
+		}
+		
+		files[idx].canceled=false;
+		var c=_getid('gd_cancel2');
+		if(c){
+			c.style.display='';
+			c.onclick=function(){
+				xhr.abort(); 
+				xhr2.abort();
+				files[idx].canceled=true;
+				this.style.display='none';
+				this.onclick=function(){return false;}
+				_progress('log1','Canceled by user.','error');
+				_next();
+				return false;
+			}
+		}
+						files[idx].targetfolderid=targetfolderid2;
+						files[idx].downloadurl=files[idx].link;
+
+						f_download(function(result){
+							//console.log(result);
+							if(!result){
+								_next();
+								return;
+							}
+							if(result.error){
+								var s='Error. ';
+								if(result.error.message) s+=result.error.message+' ';
+								if(result.error.code==401){
+									s+='Login or Authorize Error.';
+								}
+								if(targetfolderid2 && s.indexOf(targetfolderid2)>=0 && s.toLowerCase().indexOf("file not found")>=0) s+=' Target folder for save does not seem to exist.';
+								_progress('log1',s,'error');
+							}else if(result.id){
+								var s='['+(idx+1)+'/'+files.length+'] Uploaded to Drive.';
+								var s2=henc(files[idx].filename);
+								var link=result.alternateLink || result.webContentLink;
+								if(link) s2+=' &nbsp;<a href="'+link+'" target="_blank" title="View this file">View</a>';
+								if(result.parents && result.parents[0] && result.parents[0].id){
+									s2+=' &nbsp;<a href="'+gd_weburl()+'#folders/'+result.parents[0].id+'" target="_blank" title="Show folder">Folder</a>';
+								}
+								if(result.downloadUrl){
+									try{
+										accessToken=gapi.auth.getToken().access_token;
+									}catch(err){}
+									if(accessToken) s2+=' &nbsp;<a href="'+(result.webContentLink || (result.downloadUrl+'&access_token='+encodeURIComponent(accessToken)))+'" target="_blank" download="">Download</a>';
+								}
+								s2+=' &nbsp;<a href="#" onclick="proc_delete(\''+result.id+'\',this);return false" data="'+escape(result.title || '')+'" title="Delete this file">Delete</a>';
+								proc_log('log1',s,'uploaded',s2);
+							}
+							_next();
+						},xhr2,files,idx,xhr);
+	}//get
+
+	get(0);
+  }
+}
+
+function refresh_gd_files(data){
+	function find(idx,obj){
+		var s,d;
+		for(var i = 0; i <= gd_files.length-1; i++){
+			if(gd_files[i].idx==data.idx){
+				gd_files[i].size=data.size;
+				d=gd_files[i];
+				s=d.filename+' ('+getsize(d.size)+')'+' - '+d.service;
+				obj.text=s;
+				return;
+			}
+		}
+	}
+	var a=_getid("attachment");
+	for(var i=a.options.length-1;i>=0;i--){
+		if(data.idx==a.options[i].value){
+			find(a.options[i].value, a.options[i]);
+			if(a.options[i].selected) attachment_onchange();
+			break;
+		}
+	}
+}
+
+var g_maxdown=100;
+var g_corsproxy='../../external.html?link=https://speedtesting.herokuapp.com/proxyrss/geturl.php?url=';
+function f_download(callback,xhr,files,idx,xhr2){
+	//g_maxdown=parseInt(_getid('c_maxdown').value);
+	if(!g_maxdown || isNaN(g_maxdown) || g_maxdown<0) g_maxdown=100;
+
+	function _error(s){
+		var result={};
+		result.error={"message":s};
+		callback(result);
+	}
+	function _end(){
+		callback();
+	}
+	function _progress(s,nolog){
+		var s1='['+(idx+1)+'/'+files.length+'] '+s+' '+files[idx].filename;
+		if(!nolog) proc_log('log1',s1);
+		var a=_getid("gd_progress2");
+		if(a) a.innerHTML=henc(s1);
+	}	
+	if(files[idx].size>g_maxdown*1024*1024){
+		_error('The maximum download size is about '+g_maxdown+' M available. Please download it manually.');
+		return;
+	}
+	_progress('Downloading...', true);
+
+		var downloadurl=files[idx].downloadurl;
+		if(!downloadurl){
+			_error('Error. Can not find a Download URL.');
+			return;
+		}
+
+		if(g_canceled){
+			_end();return;
+		}
+		function go(retry){
+			if(!retry)retry=0;
+			if(retry>1) g_corsproxy='../../external.html?link=https://allow-any-origin.appspot.com/';
+			function _retry(){
+				setTimeout(function(){
+					retry++;
+					go(retry);
+				},2000);
+			}
+				try{		
+					gd_lastprogress=(new Date()).getTime();
+					if(files[idx].canceled)return;					
+					files[idx].size=0;
+					var su;
+					if(downloadurl.toLowerCase().indexOf("http")!=0){
+						su=downloadurl;
+						retry=100;
+					}else{
+						su=g_corsproxy+downloadurl;
+						if(g_corsproxy.indexOf('proxyrss')>=0) su=g_corsproxy+encodeURIComponent(downloadurl);
+					}
+					xhr.open('GET.html', su);
+					xhr.responseType = 'arraybuffer';
+					xhr.onprogress=function(event){
+						if(gd_lastprogress){
+							var elaspetime = new Date();
+							var dt=(elaspetime.getTime()-gd_lastprogress);
+							if(dt<300)return;
+							gd_lastprogress=elaspetime.getTime();
+						}
+						var a=event;
+						var total=a.totalSize || a.total || files[idx].size || 0;
+						if(total>=18446744073709552000) total=0;
+						var current=a.position || a.loaded  || 0;
+						_progress('Downloading... ('+number_format(current)+'/'+number_format(total)+')', true);
+						if(total>0 && files[idx].size==0){
+							files[idx].size=total;
+							refresh_gd_files(files[idx]);
+							if(files[idx].size>g_maxdown*1024*1024){
+								xhr.abort();
+								_error('The maximum download size is about '+g_maxdown+' M available. Please download it manually.');
+							}
+						}
+					};
+				    xhr.onload = function(){
+						if(this.status == 200){
+							try{
+								var b = new Blob([this.response]);
+							}catch(err){	
+								_error(err);return;
+							}
+							if(b.size>0 && files[idx].size==0){
+								files[idx].size=b.size;
+								refresh_gd_files(files[idx]);
+							}
+							_progress('Downloaded.',true);
+							gd_checklogin(function(){
+								f_upload(function(result){
+									callback(result);
+								},xhr2,files,idx,false,b);							
+							});
+						}else{
+							if(retry<3){
+								_retry();return;
+							}
+							_error("Error (status) " + this.status + "("+this.statusText+") occurred while receiving the file.");
+						}						
+					};
+					xhr.onerror = function(e){      
+						if(retry<3){
+							_retry();return;
+						}
+						_error("Error " + e.target.status + " occurred while receiving the file.");
+					};
+					xhr.send();
+				}catch(err){
+					_error(err+' or This browser does not support. Please upgrade your browser.');
+				}
+		}
+		go();
+}
+function f_upload(callback,xhr,files,idx,isconvert,filedata){
+	//var maxfilesize=1024*1024*50;	
+	var chunk=256*1024*2*10*4; //20M
+	var accessToken = gapi.auth.getToken().access_token;
+	var reader;
+	var cresp=files[idx];
+	var len;
+	if(!isconvert) len=filedata.size;
+	else len=cresp.size;
+
+	function _error(s){
+		var result={};
+		result.error={"message":s};
+		callback(result);
+	}
+	function _end(){
+		callback();
+	}
+	function _progress(s,nolog){
+		var s1='['+(idx+1)+'/'+files.length+'] '+s+' '+(cresp.filename);
+		if(!nolog) proc_log('log1',s1);
+		var a=_getid("gd_progress2");
+		if(a) a.innerHTML=henc(s1);
+	}
+	_progress('Uploading...', true);
+
+	//////filedata read	
+	function _getfiledata(start,chunk,response){	
+		if(!isconvert){
+			var end=start+chunk;
+			if(end>len)end=len;
+			response(filedata.slice(start,end));
+			return;
+		}
+		/*if(files[idx].f.size>maxfilesize){
+			_error('Error. The maximum size for this task is '+(maxfilesize/1024/1024)+' M.');
+			return;
+		}*/
+		if(!reader) reader = new FileReader();
+		reader.onload = function(e) {
+			var b = new Blob([e.target.result]);
+			response(b);
+		};
+		reader.onerror = function(){
+			_error('Read Error: '+files[idx].f.name);
+		};
+		var blob;
+		if(files[idx].f.slice) blob=files[idx].f.slice(start,chunk+start);
+		else if(files[idx].f.webkitSlice) blob=files[idx].f.webkitSlice(start,chunk+start);
+		else if(files[idx].f.mozSlice) blob=files[idx].f.mozSlice(start,chunk+start);		
+		if(!blob){
+			_error("Read Error: This browser does not support FileReader slice.");
+			return;
+		}
+		if(!reader.readAsArrayBuffer){
+			_error("Read Error: This browser does not support FileReader API.");
+			return;
+		}else{
+			reader.readAsArrayBuffer(blob);
+		}
+	}
+	
+//////upload
+function _upload(){
+	if(files[idx].canceled)return;
+	if(g_canceled){
+		_end();return;
+	}
+	
+	function _up(url, start){
+		gd_checklogin(function(){
+			accessToken=gapi.auth.getToken().access_token;
+			if(!accessToken){
+				_error('Error!! No access token for Google Drive.');	return;
+			}
+			_up2(url, start);
+		});
+	}
+	function _up2(url, start){
+		var end=start+chunk;
+		if(end>len) end=len;
+
+	function _go(cfiledata){
+		if(g_canceled){
+			_end();return;
+		}
+		if(!cfiledata){
+			_error('Chunk filedata read 0 byte.');				
+			return;
+		}		
+			
+		if(start==0) gd_lastprogress=(new Date()).getTime();
+		
+		var method='PUT';
+		if(files[idx].canceled)return;
+		xhr.open(method, url);
+		xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+		xhr.setRequestHeader('Content-Range', 'bytes '+start+'-'+(end-1)+'/'+len);
+		if(xhr.upload){
+			xhr.upload.onprogress=function(event){
+				if(gd_lastprogress){
+					var elaspetime = new Date();
+					var dt=(elaspetime.getTime()-gd_lastprogress)/1000;
+					if(dt<1)return;
+					gd_lastprogress=elaspetime.getTime();
+				}
+				var a=event;
+				var total=a.totalSize || a.total || 0;
+				var current=a.position || a.loaded  || 0;
+				current=current+start;
+				_progress('Uploading.. ('+number_format(current)+'/'+number_format(len)+')', true);
+			};
+		}
+	    xhr.onload = function(){
+			//var status=xhr.getResponseHeader("status");
+			var range;
+			if(!this.response) range=xhr.getResponseHeader("range");
+			if(range){
+				var next=parseInt(range.split('-')[1]);
+				if(!next || isNaN(next)){
+					error('Results range value error');				
+				}else{
+					_up(url, next+1);
+				}
+				return;
+			}else{
+				var result;
+				try{
+					result=JSON.parse(this.response);
+				}catch(err){
+					result='';				
+				}
+				if(result){
+					callback(result);
+				}else{
+					_error('Results value error');				
+				}
+			}			
+		};
+		xhr.onerror = function(e){      
+			_error("Error " + e.target.status + " occurred while uploading the file.");
+		};
+		xhr.send(cfiledata); 	
+	}
+		
+		_getfiledata(start,chunk,function(s){
+			try{
+				_go(s);
+			}catch(err){
+				_error('Error. '+err);
+			}
+		});
+	}
+
+	try{
+		var method='POST';
+		var path='/upload/drive/v2/files';
+		var param='uploadType=resumable';
+		if(isconvert) param+='&convert=true';
+		
+		if(!cresp.filename) cresp.title='No Name';
+		if(!cresp.mimeType) cresp.mimeType=getmimetype(cresp.filename) || 'application/octet-stream';		
+        var metadata = {
+            'title': cresp.filename,
+            'mimeType': cresp.mimeType
+        };
+		if(files[idx].targetfolderid) metadata.parents=[{"id": files[idx].targetfolderid}];			
+		
+		var body=JSON.stringify(metadata);
+		_progress('Request upload...',true);
+
+		if(files[idx].canceled)return;
+		if(xhr.upload) xhr.upload.onprogress=null;
+		xhr.open(method, 'https://www.googleapis.com'+path+'?'+param, true);
+		//xhr.open(method, 'https://content.googleapis.com'+path+'?'+param, true);
+		xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+		xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+		xhr.setRequestHeader('X-Upload-Content-Type', cresp.mimeType || 'application/octet-stream');
+		xhr.setRequestHeader('X-Upload-Content-Length', len);
+	    xhr.onload = function(){
+			var url=xhr.getResponseHeader("Location");
+			if(url){
+				_up(url, 0);
+			}else{
+				var s=this.response || '';
+				if(files[idx].targetfolderid && s.indexOf(files[idx].targetfolderid)>=0 && s.toLowerCase().indexOf("file not found")>=0) _error('Target folder for save does not seem to exist.');
+				else _error('Error. Can not find resumable upload URL.');
+			}
+		};
+		xhr.onerror = function(e){      
+			var s="Error " + e.target.status + " occurred while uploading the file.";
+			_error(s);
+		};
+		xhr.send(body); 	
+	}catch(err){
+		_error(err+' or This browser does not support. Please upgrade your browser.');
+	}
+}
+//////upload
+	_upload();
+}
+
+function proc_delete(fileid,f){
+	if(!fileid) return;
+	if(gd_isdownloading){
+		alert("Please try again in a few minutes. or Cancel the current job.");
+		return;
+	}	
+	//gd_isdownloading=true;
+	var title=unescape(f.getAttribute("data") || '');
+	function _log(s){
+		var a=_getid('gd_progress2');
+		if(a) a.innerHTML=s;
+	}
+	_log('Deleting...');
+	var request = gapi.client.drive.files['delete']({
+		'fileId': fileid
+	});
+	request.execute(function(resp){
+		//gd_isdownloading=false;
+		var s;
+		if(resp.result && !resp.message){
+			s='<font style="color:green">File deleted successfully. '+henc(title)+'</font>';
+			_log(s);
+		}else{
+			s='<font style="color:red">Delete failed. <b>'+resp.message+'</b> '+henc(title)+'</font>';
+			_log(s,'error');
+		}		
+	});
+}
+function proc_setfolder(id,name,kind){
+	var s;
+	if(id){
+		s=gd_weburl()+'#folders/'+id;
+	}else{
+		s=gd_weburl();
+		name='Root Folder';
+	}
+	s='<a href="'+s+'" target="_blank" title="Show Folder">'+henc(name)+'</a>';
+	if(!kind || kind==2){
+		_getid("foldername2").innerHTML=s;		
+		setstorage('mp3t_gd_folder_id',id);
+		setstorage('mp3t_gd_folder_name', name);
+	}else{
+		_getid("foldername").innerHTML=s;
+		_getid('btn_cleartemp').disabled=false;
+	}
+}
+
+
+function attach_delete(){
+	function remove(idx){
+		for(var i = 0; i <= gd_files.length-1; i++){
+			if(gd_files[i].idx==idx){
+				gd_files.splice(i,1);
+				return;
+			}
+		}
+	}
+	var a=_getid("attachment");
+	var k=-1;
+	for(var i=a.options.length-1;i>=0;i--){
+		if(a.options[i].selected){
+			remove(a.options[i].value);
+			a.remove(i);
+			k=i;
+		}
+	}
+	if (k>a.options.length-1) k=a.options.length-1;
+	if (k>=0){
+		a.selectedIndex=k;
+	}
+	attachment_count();
+}
+function attach_clear(){
+	var a=_getid("attachment");
+	for(var i=a.options.length-1;i>=0;i--) a.remove(i);
+	gd_files=[];
+	//gd_files_count=0;
+	attachment_count();
+}
+function attachment_onchange(f){
+	function find(idx){
+		for(var i = 0; i <= gd_files.length-1; i++){
+			if(gd_files[i].idx==idx){
+				var s='<a id="slink" href="'+gd_files[i].link+'" target="_blank" title="Download this file">'+henc(gd_files[i].filename)+'</a>';
+				s+=' ('+getsize(gd_files[i].size)+') - '+gd_files[i].service;
+				s+='<br><font color=black>Filename: <input type=text style="width:400px" id="txtname" spellcheck="false"> <button onclick="txtname_onchange('+idx+')">Change</button></font>';
+				_getid("desc").innerHTML=s;
+				_getid('slink').download=gd_files[i].filename;
+				_getid('txtname').value=gd_files[i].filename;
+				return;
+			}
+		}
+	}
+	var a=_getid("attachment");
+	for(var i=a.options.length-1;i>=0;i--){
+		if(a.options[i].selected){
+			find(a.options[i].value);
+			break;
+		}
+	}
+}
+function txtname_onchange(idx){
+	var name=trim(_getid('txtname').value);
+	if(!name)return;
+	function find(idx){
+		for(var i = 0; i <= gd_files.length-1; i++){
+			if(gd_files[i].idx==idx){
+				gd_files[i].filename=name;
+				return gd_files[i];
+			}
+		}
+	}
+	var a=_getid("attachment");
+	for(var i=a.options.length-1;i>=0;i--){
+		if(a.options[i].value==idx){
+			var d=find(idx);
+			if(!d)return;
+			a.options[i].text=d.filename+' ('+getsize(d.size)+')'+' - '+d.service;
+			for(var j=a.options.length-1;j>=0;j--){
+				if(a.options[j].selected) a.options[j].selected=false;
+			}
+			a.selectedIndex=i;
+			attachment_onchange();
+			break;
+		}
+	}
+}
+function attachment_count(){
+	_getid("downlink").innerHTML="Add a file to the list below. ("+gd_files.length+" Added)";
+}
+
+function gd_open_picker(kind){
+	if(!gd_useable())return;
+	gd_login(function(result){
+		if(!result) return;
+		gd_createpicker(kind);
+	},true);
+}
+function gd_useable(){
+	if(!gd_issupported){
+		alert("This browser does not support.");
+		return;
+	}
+	if(!gd_loaded || !gd_pickerloaded){
+		alert('Not loaded library. Please try again in a few minutes.');
+		return;
+	}
+	return true;
+}
+
+function gd_open_state(force){
+	var s=gd_state;
+	if(s){
+		if(!gd_issupported){
+			gd_state='';
+			alert("This browser does not support.");
+			return;
+		}
+		s=decodeURIComponent(s);
+		try{
+			var a=JSON.parse(s);
+			var ids=[];
+			function find(b){
+				if(!b)return;
+				for(var i=0; i <= b.length-1; i++){
+					if(b[i]){
+						var cc={};
+						cc.id=b[i];
+						ids.push(cc);
+					}
+				}
+			}
+			find(a.ids);
+			find(a.exportIds);
+			if(ids.length>0){
+				gd_login(function(result){
+					if(gd_open2 && !force)return;
+					gd_open2=true;
+					if(!result) return;
+					//_getid('gd_btn_reopen').style.display='';
+					gd_state='';
+					gd_loadfiles(ids,true);
+				});				
+			}
+		}catch(err){
+		}
+	}
+}
+function gd_clientload(){
+	gd_loaded=true;
+	if (window.addEventListener){
+		window.addEventListener("resize", gd_btn_login2, false);
+	}else if (window.attachEvent){
+		window.attachEvent("onresize", gd_btn_login2);
+	}
+	gd_open_state();
+}
+var gd_open2;
+function gd_open_state2(){
+	setTimeout(function(){
+		if(!gd_open2)gd_open_state();
+	}, 1000);
+}
+
+function gd_loadscript(callback){
+	function inject(s){
+		var o = document.createElement('scri' + 'pt');
+		o.setAttribute('src', s);
+		o.setAttribute('type', 'text/javascript');
+		document.body.appendChild(o);
+	}
+	if(gd_load_timer)return;
+	if(gd_loaded && gd_pickerloaded)return;
+	gd_load_timer=setInterval(function(){
+		if(gd_loaded && gd_pickerloaded){
+			clearInterval(gd_load_timer);
+			if(callback) callback();
+		}
+	},100);
+	inject('../../apis.google.com/js/clientc0c4.js');
+	inject('../../apis.google.com/js/api825b.js');	
+}
+function gd_dblclick(){
+	function dblclick(){
+		try{
+			if(gd_picker)gd_picker.setVisible(false);
+		}catch(err){}
+	}
+	function keydown(e){
+		if(!e)e=window.event;
+		if(e && e.keyCode==27) dblclick();
+	}
+	if(window.addEventListener){
+		document.addEventListener("dblclick", dblclick, false);
+		document.addEventListener("keydown", keydown, false);
+	}else if(window.attachEvent){
+		document.attachEvent("ondblclick", dblclick);
+		document.attachEvent("onkeydown", keydown);
+	}
+}
+var gd_userId,gd_email;
+function gd_weburl(){
+	var s;
+	if(gd_email) s='https://drive.google.com/?authuser='+gd_email;
+	else s='../../external.html?link=https://drive.google.com/';
+	return s;
+}
+function gd_info(){
+	if(gd_email)return;
+	gapi.client.load('drive', 'v2', function(){
+		var request = gapi.client.drive.about.get();
+		request.execute(function(resp) {
+			if(resp && resp.user){
+				if(gd_email)return;
+				gd_email=resp.user.emailAddress;
+				if(gd_email){
+					var a=_getid('btn_open');
+					var b=_getid('gd_btn_reopen');
+					if(a)a.title=a.title+' ('+gd_email+')';
+					if(b)b.title=b.title+' ('+gd_email+')';
+				}				
+			}
+		});
+	});
+}
+function gd_init(){
+	gd_dblclick();	
+	gd_state2=gd_state;
+	if(!window.XMLHttpRequest){//!window.FileReader || !window.URL ||
+	}else{
+		gd_issupported=true;
+		if(gd_state){
+			try{
+				var a=JSON.parse(gd_state);
+				gd_userId=a.userId;
+				if(a.ids || a.exportIds){
+					_getid("downlink").innerHTML="<table><tr><td><div id='gd_progress'>Ready...</div></table>";
+				}
+			}catch(err){}
+			if(window.addEventListener) window.addEventListener("load", gd_open_state2, false);
+			else if (window.attachEvent) window.attachEvent("onload", gd_open_state2);
+		}
+		gd_loadscript();
+	}
+}
+init_load();
+gd_init();
+
+var gfids,gfidstimer;
+function proc_additem(arr,autosel,fuserId,fids,gfidsName){
+	/*for(var i = 0; i <= gd_files.length-1; i++){
+		if(gd_files[i].link==link){
+			var a=_getid("attachment");
+			for(var j=a.options.length-1;j>=0;j--){
+				if(a.options[j].value==gd_files[i].idx){
+					a.selectedIndex=j;
+					attachment_onchange();
+					break;
+				}
+			}
+			return;
+		}
+	}*/
+	if(gd_isdownloading)return;
+	attach_clear();
+	var obj2=_getid("attachment");
+	var data;
+	for(var i = 0; i <= arr.length-1; i++){
+		data={};
+		data.service='User Added';
+		data.name=arr[i].filename;
+		data.link=arr[i].bloburl;		
+		data.mimeType=arr[i].mimeType || '';
+		data.size=arr[i].size || 0;
+		cl_additem(obj2,data);
+	}
+	if(autosel){
+		obj2.selectedIndex=obj2.options.length-1;
+		attachment_onchange();
+	}
+	attachment_count();
+
+	if(fuserId) gd_userId=fuserId;
+	if(fids && gfids!=fids){
+		gfids=fids;
+		function go(){
+			gd_login(function(result){
+				if(!result) return;
+				//gd_loadfiles([{'id':fids,'name':gfidsName || 'No Name'}],true);				
+				function _set(resp){
+					var s=resp.title || 'No Name';
+					_getid('foldername3').innerHTML='<a href="#" id="asetfolder">Select this folder</a> '+henc(s);
+					_getid('asetfolder').onclick=function(){
+						proc_setfolder(resp.id, s);
+						return false;
+					}
+				}
+				_set({'title':'Parent folder of '+(gfidsName || 'No Name'), 'id':fids});
+			},true);				
+		}
+		if(gd_loaded){
+			go();
+		}else{
+			clearInterval(gfidstimer);
+			gfidstimer=setInterval(function(){
+				if(gd_loaded){
+					clearInterval(gfidstimer);
+					go();
+				}
+			},300);
+		}
+	}
+}
+function proc_close(){
+	if(gd_isdownloading){
+		alert("It's working... Please try again in a few minutes. or Cancel the current job.");
+		return;
+	}
+	attach_clear();
+	if(parent && parent.proc_saver_close){
+		parent.proc_saver_close();
+	}
+}
+</script>
+
+<script src="../../storage.googleapis.com/app0126/js/bottom.js"></script>
+</body>
+
+<!-- Mirrored from overbits.herokuapp.com/mp3tageditor/save_to_drive.php?twidth= by HTTrack Website Copier/3.x [XR&CO'2017], Wed, 28 Aug 2024 01:14:55 GMT -->
+</html>
